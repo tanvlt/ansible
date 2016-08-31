@@ -1,0 +1,34 @@
+---
+- name: Install Openssl-devel
+  yum: name=openssl-devel state=present
+
+##Delete ossce agent##
+- name: Delete Old ossec-agent
+  file: name={{ item }} state=absent
+  with_items:
+     - { /var/ossec }
+     - { /etc/init.d/ossec }
+
+
+###Download ossec agent and template##
+- name: Download ossec Agent
+  get_url: url=http://yum/ossec/ossec-hids-2.8.1.tar.gz dest=/opt/
+
+###Extract Source###
+- name: Extract Source Ossec
+  unarchive: copy=no src=/opt/ossec-hids-2.8.1.tar.gz dest=/opt/
+
+- name: Copy the Ossec_input file
+  template: src=ossec_client_input.txt dest=/opt/ossec-hids-2.8.1/ossec_client_input.txt
+
+##install#####
+- name: Install Ossec-agent
+  shell: ./install.sh < ossec_client_input.txt 
+  args:
+    chdir: /opt/ossec-hids-2.8.1
+
+
+- name: Authen server
+  command: /var/ossec/bin/agent-auth -m "{{ossec_server_ip}}" -p 1515
+  notify:
+    - Start Agent

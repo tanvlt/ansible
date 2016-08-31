@@ -1,0 +1,3 @@
+---
+- name: Start Agent
+  command: /var/ossec/bin/ossec-control start
