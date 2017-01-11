@@ -1,0 +1,7 @@
+---
+- hosts: test
+  tasks:
+   - name: Edit file /etc/rsyslog.conf
+     shell:  sed -i '/log\/messages$/c\*\.info;mail\.none;authpriv.none;cron.nonel;!tag_audit_log \t \/var\/log\/messages' /etc/rsyslog.conf
+   - name: Restart rsyslog
+     service: name=rsyslog state=restarted

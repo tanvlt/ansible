@@ -1,0 +1,14 @@
+---
+- hosts: linux_22 
+  tasks:
+  - name: Edit file rsyslog.conf
+    lineinfile: dest=/etc/rsyslog.conf 
+                regexp='log\/messages$'
+                line='*.info;mail.none;authpriv.none;cron.nonel;!tag_audit_log \t /var/log/messages'
+                state=present
+    notify:
+          - Restart rsyslog
+
+  handlers:
+   - name: Restart rsyslog
+     service: name=rsyslog state=restarted
