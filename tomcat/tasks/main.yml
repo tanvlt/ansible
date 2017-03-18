@@ -1,0 +1,35 @@
+---
+- name: Download Java
+  copy: src=jdk-7u79-linux-x64.tar.gz dest=/opt/
+
+- name: Extrac java
+  unarchive: copy=no src=jdk-7u79-linux-x64.tar.gz dest=/opt/
+
+- name: Set java environment
+  template: src=jdk.sh dest=/etc/profile.d/jdk.sh
+  notify: set java env
+
+- name: Add User tomcat
+  user: name=tomcat group=tomcat home=/home/tomcat
+
+- name: Download Tomcat
+  copy: src=apache-tomcat-7.0.63.tar.gz dest=/opt
+
+- name: Create Tomcat fordel
+  file: path=/tomcat state=directory
+
+- name: Extrac Tomcat
+  shell: /bin/tar xvf /opt/apache-tomcat-7.0.63.tar.gz -C /tomcat/  --strip-components=1 && chown -R tomcat.tomcat /tomcat/ && chmod 775 /tomcat/
+
+- name: Change Owner
+  file: path=/tomcat/ owner=tomcat group=tomcat  mode=0775
+
+- name: Import Script Init
+  copy: src=tomcat.sh dest=/etc/init.d/tomcat mode=u+rwx
+
+- name: Enable tomcat
+  service: name=tomcat enabled=yes
+
+- name: Start tomcat
+  service: name=tomcat state=started
+   
